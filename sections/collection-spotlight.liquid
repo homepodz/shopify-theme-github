@@ -1,0 +1,273 @@
+{% assign product_limit = section.settings.columns | times: section.settings.rows %}
+{% assign alignment = section.settings.alignment %}
+{% assign spacing = section.settings.spacing %}
+{% assign image_align = section.settings.image_alignment %}
+{% assign position = section.settings.collection_position %}
+{% assign gap = section.settings.image_product_gap %}
+{% assign top_margin = section.settings.section_top_margin %}
+{% assign view_all_alignment = section.settings.button_alignment %}
+
+{% if position == 'left' %}
+  {% assign flex_direction = 'row' %}
+{% else %}
+  {% assign flex_direction = 'row-reverse' %}
+{% endif %}
+
+<style>
+  #spotlight-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    flex-direction: {{ flex_direction }};
+    gap: {{ gap }}px;
+    margin-top: {{ top_margin }}px;
+  }
+
+  #spotlight-{{ section.id }} .collection-image {
+    flex: 1;
+    border: {{ section.settings.border_collection }}px solid #e5e5e5;
+  }
+
+  #spotlight-{{ section.id }} .collection-products {
+    flex: 2;
+    text-align: {{ alignment }};
+    border: {{ section.settings.border_products }}px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #spotlight-{{ section.id }} .collection-products-grid {
+    display: inline-grid;
+    grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    gap: {{ spacing }}px;
+  }
+
+  #spotlight-{{ section.id }} .product-card {
+    transform: scale({{ section.settings.scale }});
+    transform-origin: top left;
+    border: {{ section.settings.border_products }}px solid #ccc;
+  }
+
+  #spotlight-{{ section.id }} .view-all-button {
+    margin-top: 30px;
+    text-align: {{ view_all_alignment }};
+  }
+
+  #spotlight-{{ section.id }} .view-all-button a {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    border: {{ section.settings.border_button }}px solid #000;
+  }
+
+  @media screen and (max-width: 767px) {
+    #spotlight-{{ section.id }} {
+      flex-direction: {{ flex_direction }};
+    }
+
+    #spotlight-{{ section.id }} .collection-image,
+    #spotlight-{{ section.id }} .collection-products {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+
+    #spotlight-{{ section.id }} .collection-products-grid {
+      grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+    }
+
+    #spotlight-{{ section.id }} .collection-products {
+      text-align: {{ alignment }};
+    }
+
+    #spotlight-{{ section.id }} .view-all-button {
+      text-align: {{ view_all_alignment }};
+    }
+  }
+</style>
+
+<div id="spotlight-{{ section.id }}">
+  <!-- Collection Image -->
+  <div class="collection-image">
+    {% if section.settings.collection.image %}
+      <img src="{{ section.settings.collection.image | img_url: '800x' }}" alt="{{ section.settings.collection.title }}" style="width: 100%; height: auto;" />
+    {% endif %}
+  </div>
+
+  <!-- Product Grid + Button -->
+  <div class="collection-products">
+    <div class="collection-products-grid">
+      {% for i in (1..12) %}
+        {% assign product_key = "product_" | append: i %}
+        {% assign product = all_products[section.settings[product_key]] %}
+        {% if product and forloop.index <= product_limit %}
+          <div class="product-card">
+            <a href="{{ product.url }}">
+              <div style="text-align: {{ image_align }};">
+                <img src="{{ product.featured_image | img_url: '300x' }}" alt="{{ product.title }}" style="width: 100%; height: auto; max-width: 300px;" />
+              </div>
+              <h3>{{ product.title }}</h3>
+            </a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- View All Button -->
+    {% if section.settings.collection.url %}
+      <div class="view-all-button">
+        <a href="{{ section.settings.collection.url }}">
+          {{ section.settings.view_all_text }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Spotlight Block",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Choose a Collection"
+    },
+    {
+      "type": "number",
+      "id": "columns",
+      "label": "Number of columns",
+      "default": 2
+    },
+    {
+      "type": "number",
+      "id": "rows",
+      "label": "Number of rows",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "scale",
+      "label": "Product size scale",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "number",
+      "id": "spacing",
+      "label": "Spacing between products (px)",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Product alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_alignment",
+      "label": "Product Image Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "collection_position",
+      "label": "Collection Image Position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "number",
+      "id": "image_product_gap",
+      "label": "Spacing between collection and products (px)",
+      "default": 40
+    },
+    {
+      "type": "number",
+      "id": "section_top_margin",
+      "label": "Top spacing from previous section (px)",
+      "default": 60
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Button Text",
+      "default": "View All"
+    },
+    {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "View All Button Alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "border_collection",
+      "label": "Collection Image Border (px)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_products",
+      "label": "Product Card Border (px)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_button",
+      "label": "Button Border (px)",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0
+    },
+    { "type": "product", "id": "product_1", "label": "Select Product 1" },
+    { "type": "product", "id": "product_2", "label": "Select Product 2" },
+    { "type": "product", "id": "product_3", "label": "Select Product 3" },
+    { "type": "product", "id": "product_4", "label": "Select Product 4" },
+    { "type": "product", "id": "product_5", "label": "Select Product 5" },
+    { "type": "product", "id": "product_6", "label": "Select Product 6" },
+    { "type": "product", "id": "product_7", "label": "Select Product 7" },
+    { "type": "product", "id": "product_8", "label": "Select Product 8" },
+    { "type": "product", "id": "product_9", "label": "Select Product 9" },
+    { "type": "product", "id": "product_10", "label": "Select Product 10" },
+    { "type": "product", "id": "product_11", "label": "Select Product 11" },
+    { "type": "product", "id": "product_12", "label": "Select Product 12" }
+  ],
+  "presets": [
+    {
+      "name": "Spotlight Block"
+    }
+  ]
+}
+{% endschema %} 

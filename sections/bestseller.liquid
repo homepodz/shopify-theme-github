@@ -1,0 +1,124 @@
+{% assign position = section.settings.image_position %}
+{% if position == 'left' %}
+  {% assign layout_direction = 'row' %}
+{% else %}
+  {% assign layout_direction = 'row-reverse' %}
+{% endif %}
+
+<style>
+  #bestseller-{{ section.id }} {
+    display: flex;
+    flex-direction: {{ layout_direction }};
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px;
+    gap: 40px;
+    background-color: #fafafa;
+    flex-wrap: wrap;
+  }
+
+  #bestseller-{{ section.id }} .product-image {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  #bestseller-{{ section.id }} .product-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  #bestseller-{{ section.id }} .product-info {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #bestseller-{{ section.id }} .product-info h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  #bestseller-{{ section.id }} .product-info p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  #bestseller-{{ section.id }} .buy-button {
+    background-color: #111;
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 6px;
+    width: fit-content;
+  }
+
+  @media screen and (max-width: 768px) {
+    #bestseller-{{ section.id }} {
+      flex-direction: column;
+      text-align: center;
+    }
+    #bestseller-{{ section.id }} .product-info {
+      align-items: center;
+    }
+  }
+</style>
+
+<div id="bestseller-{{ section.id }}">
+  <div class="product-image">
+    {% if section.settings.product.featured_image %}
+      <img src="{{ section.settings.product.featured_image | img_url: '800x' }}" alt="{{ section.settings.product.title }}" />
+    {% endif %}
+  </div>
+
+  <div class="product-info">
+    <h2>{{ section.settings.product.title }}</h2>
+    <p>{{ section.settings.description }}</p>
+    <a class="buy-button" href="{{ section.settings.product.url }}">{{ section.settings.button_text }}</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Best Seller Feature",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Select Product"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Short Description",
+      "default": "This is our best-selling product. Discover why everyone loves it."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Buy Now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Best Seller Feature"
+    }
+  ]
+}
+{% endschema %}
